@@ -1,6 +1,7 @@
 # Roulette Simulator
 
 This repository contains a Python script that simulates a roulette betting strategy. The strategy involves progressively increasing bet amounts after losses and optionally splitting large loss amounts to manage bet sizes.
+This simulation is based on the strategy created by Casino Matchmaker on Youtube and this video: https://www.youtube.com/watch?v=unr7esN85W8
 
 ## Betting Strategy Overview
 
