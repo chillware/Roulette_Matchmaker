@@ -1,3 +1,31 @@
+"""
+Roulette Simulator
+
+This script simulates a roulette betting strategy known as the Matchmaker, created by Casino Natchmaker on Youtube.
+Recommend wathing the video to understand the strategy https://www.youtube.com/watch?v=unr7esN85W8
+It always uses the first two dozens, this is configurable. 
+The strategy involves progressively increasing bet amounts after losses and 
+splitting large loss amounts to manage bet sizes.
+
+Configuration:
+- num_sessions: Number of sessions to run the simulation for.
+- use_double_zero: Whether to use a double zero (American) wheel.
+- initial_table: Initial sequence of numbers for bet calculation (default is ten 1's).
+- dozens_to_bet: Tuple indicating which dozens to bet on (default is first two dozens).
+- max_split_value: Maximum value for splitting loss amounts. Set to None to disable splitting.
+
+Usage:
+- Adjust the configuration parameters in the `RouletteSimulator` class initialization.
+- Run the simulation by calling the `run_simulation` method.
+- Analyze the results, including the highest bet amount, total profit/loss, and more.
+
+Output:
+- Script outputs results of two runs of 100 sessions (a session completes a table of 10 1's)
+- First output does not split large bets and adds them to the table as the full loss anount
+- Second output splits any bet over 100 to be under 100 amd adds them to the table.
+
+"""
+
 import random
 
 class RouletteSimulator:
@@ -5,11 +33,12 @@ class RouletteSimulator:
         self.num_sessions = num_sessions
         self.use_double_zero = use_double_zero
         self.dozens_to_bet = dozens_to_bet
-        self.initial_table = initial_table if initial_table else [1] * 10
+        self.initial_table = initial_table if initial_table else [1] * 10  # Default table filled with ten 1's
         self.max_split_value = max_split_value
         self.reset_simulation()
 
     def reset_simulation(self):
+        """Reset the simulation state for a new session."""
         self.table = self.initial_table.copy()
         self.balance = 0
         self.total_bet = 0
@@ -20,6 +49,7 @@ class RouletteSimulator:
         self.highest_bet = 0  # Track the highest bet amount
 
     def spin_wheel(self):
+        """Simulate spinning the roulette wheel."""
         if self.use_double_zero:
             wheel = list(range(0, 37)) + [37]  # Adding double zero as 37
         else:
@@ -27,6 +57,7 @@ class RouletteSimulator:
         return random.choice(wheel)
 
     def bet(self):
+        """Calculate the bet amount, place the bet, and update the table and balance based on the outcome."""
         if len(self.table) == 1:
             bet_amount = self.table[0]
         else:
@@ -64,6 +95,7 @@ class RouletteSimulator:
         return spin_result, dozen_result, win_first, win_second, total_bet_amount
 
     def get_dozen(self, number):
+        """Determine which dozen the spin result falls into."""
         if number == 0 or (self.use_double_zero and number == 37):
             return 0
         elif 1 <= number <= 12:
@@ -74,6 +106,7 @@ class RouletteSimulator:
             return 3
 
     def add_to_table(self, amount):
+        """Add the lost amount to the table, splitting if necessary."""
         if self.max_split_value and amount > self.max_split_value:
             split_parts = amount // self.max_split_value
             remainder = amount % self.max_split_value
@@ -85,6 +118,7 @@ class RouletteSimulator:
             self.table.append(amount)
 
     def run_simulation(self):
+        """Run the roulette simulation for the specified number of sessions."""
         results = []
         while self.current_session < self.num_sessions:
             while self.table:
@@ -110,7 +144,7 @@ class RouletteSimulator:
 simulator = RouletteSimulator(num_sessions=100, use_double_zero=False)
 spin_results, final_results = simulator.run_simulation()
 
-# Display the first 100 spins and the final results for brevity
+# Display the first 100 spins and the final results
 print("First 100 Spins:")
 print(f"{'Session':<8}{'Spin':<6}{'Result':<8}{'Dozen':<6}{'Total Bet Amount':<16}{'Total Bet':<12}{'Total Loss':<12}{'Profit':<8}{'Win Dozen':<10}")
 for result in spin_results[:100]:
@@ -129,7 +163,7 @@ print(f"Highest Bet Amount: {final_results['highest_bet']}")
 simulator_with_split = RouletteSimulator(num_sessions=100, use_double_zero=False, max_split_value=100)
 spin_results_with_split, final_results_with_split = simulator_with_split.run_simulation()
 
-# Display the first 100 spins and the final results for brevity with splitting enabled
+# Display the first 100 spins and the final results with splitting enabled
 print("\nFirst 100 Spins with Splitting:")
 print(f"{'Session':<8}{'Spin':<6}{'Result':<8}{'Dozen':<6}{'Total Bet Amount':<16}{'Total Bet':<12}{'Total Loss':<12}{'Profit':<8}{'Win Dozen':<10}")
 for result in spin_results_with_split[:100]:
